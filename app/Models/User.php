@@ -8,14 +8,15 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Laravel\Passport\HasApiTokens;
 use App\Notifications\PasswordReset;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPassword;
 
-class User extends Authenticatable
+class User extends Authenticatable implements CanResetPassword
 {
     use HasApiTokens, Notifiable;
     use HasRoles;
 
     protected $guard_name = 'api';
-    
+
     /**
      * The attributes that are mass assignable.
      *

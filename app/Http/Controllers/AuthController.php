@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Password;
 use Validator;
+use DB;
+use Carbon\Carbon;
+use Mail;
 
 class AuthController extends Controller
 {
@@ -75,5 +78,56 @@ class AuthController extends Controller
             $error = "Something went wrong.";
             return response()->json(['status' => 'error', 'message' => $error], 401);
         }
+    }
+
+    public function forgot(Request $request) {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+    
+        $token = $this->generateRandomString(64);
+    
+        DB::table('password_resets')->insert(
+            ['email' => $request->email, 'token' => $token, 'created_at' => Carbon::now()]
+        );
+
+        Mail::send('email.forgot', ['token' => $token], function($message) use($request){
+            $message->to($request->email);
+            $message->subject('Reset Password Notification');
+        });
+
+        return response()->json(["message" => 'Reset password link sent on your email address.']);
+    }
+
+    public function reset(Request $request) {
+        $request->validate([
+            'email' => 'required|email|exists:users',
+            'password' => 'required|string|min:6|confirmed',
+            'password_confirmation' => 'required',
+        ]);
+
+        $updatePassword = DB::table('password_resets')
+            ->where(['email' => $request->email, 'token' => $request->token])
+            ->first();
+
+            if(!$updatePassword)
+            return back()->withInput()->with('error', 'Invalid token!');
+      
+        $user = User::where('email', $request->email)
+                    ->update(['password' => bcrypt($request->password)]);
+    
+        DB::table('password_resets')->where(['email'=> $request->email])->delete();
+
+        return response()->json(["message" => "Password has been successfully changed."]);
+    }
+
+    public function generateRandomString($length = 64) {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+        return $randomString;
     }
 }
