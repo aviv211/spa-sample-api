@@ -16,14 +16,14 @@ class PermissionSeeder extends Seeder
      */
     public function run()
     {
-        // $accountPermission = Permission::create(['name' => 'manage accounts', 'guard_name' => 'api']);
-        // $valuePermission = Permission::create(['name' => 'manage data', 'guard_name' => 'api']);
+        $accountPermission = Permission::create(['name' => 'manage accounts', 'guard_name' => 'api']);
+        $valuePermission = Permission::create(['name' => 'manage data', 'guard_name' => 'api']);
 
-        // $adminRole = Role::create(['name' => 'admin', 'guard_name' => 'api']);
+        $adminRole = Role::create(['name' => 'admin', 'guard_name' => 'api']);
 
-        // $adminRole->syncPermissions([$accountPermission, $valuePermission]);
+        $adminRole->syncPermissions([$accountPermission, $valuePermission]);
 
-        $user = User::create(['email' => 'admin@guerilla360.com', 'password' => bcrypt('GuerillaThree60!'), 'name' => 'Vince']);
+        $user = User::create(['email' => 'admin@guerilla360.com', 'password' => bcrypt('123456'), 'name' => 'Test User']);
         $user->assignRole('admin');
     }
 }

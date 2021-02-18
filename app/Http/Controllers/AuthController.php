@@ -10,6 +10,7 @@ use Validator;
 use DB;
 use Carbon\Carbon;
 use Mail;
+use App\Mail\ResetPasswordEmail;
 
 class AuthController extends Controller
 {
@@ -91,19 +92,15 @@ class AuthController extends Controller
             ['email' => $request->email, 'token' => $token, 'created_at' => Carbon::now()]
         );
 
-        Mail::send('email.forgot', ['token' => $token], function($message) use($request){
-            $message->to($request->email);
-            $message->subject('Reset Password Notification');
-        });
+        Mail::to($request->email)->send(new ResetPasswordEmail($token));
 
         return response()->json(["message" => 'Reset password link sent on your email address.']);
     }
 
     public function reset(Request $request) {
         $request->validate([
-            'email' => 'required|email|exists:users',
-            'password' => 'required|string|min:6|confirmed',
-            'password_confirmation' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|string',
         ]);
 
         $updatePassword = DB::table('password_resets')
