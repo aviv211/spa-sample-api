@@ -4,10 +4,10 @@
 
 ## Prerequisites
 
-PHP
-Composer
-XAMPP/MAMP or any PHP database hosting service
-Mailer (Amazon SES or Mailtrap)
+- PHP
+- Composer
+- XAMPP/MAMP or any PHP database hosting service
+- Mailer (Amazon SES or Mailtrap)
 
 ## Installation
 
